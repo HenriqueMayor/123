@@ -7,7 +7,8 @@ module.exports.run = async (bot,message,args) => {
     const filter = m => !m.author.bot;
     let game = new Listing();
     
-
+    let raw = fs.readFileSync('./roles.json');
+    let allowedRoles = JSON.parse(raw);
     let validation = function(serverRoles, userRoles){
         let val = false;
         serverRoles.forEach((role) => {
