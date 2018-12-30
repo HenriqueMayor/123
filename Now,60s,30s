@@ -1,0 +1,43 @@
+module.exports.run = async (bot,message,args) => {
+
+    message.channel.send ("Scrim começando agora!");
+}
+
+
+
+module.exports.help = {
+    name: "now"
+
+}
+
+
+
+
+
+module.exports.run = async(bot,message,args) =>{
+
+
+    message.channel.send("Próximo scrim em 60 segundos!");
+
+}
+
+
+module.exports.help = {
+    name: "60s"
+
+}
+
+
+
+
+
+module.exports.run = async(bot,message,args) => {
+
+    message.channel.send("Próximo scrim em 30 segundos!");
+
+}
+
+
+module.exports.help = {
+    name: "30s"
+}
