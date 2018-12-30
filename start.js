@@ -77,7 +77,7 @@ module.exports.run = async (bot,message,args) => {
     collector.on('collect', m =>{
         console.log(`Collected $(m.content) | ${m.author.username}`);
 
-        if (validation(allowedRoles.roles,msg.member.roles.array())){
+        if (validation(allowedRoles.roles,m.member.roles.array())){
             if (m.content === "!start"){
                 collector.stop();
                 console.log("Colector stopped");
@@ -147,6 +147,8 @@ module.exports.run = async (bot,message,args) => {
 module.exports.help = {
     name : "start"
 }
+
+
 
 
 
