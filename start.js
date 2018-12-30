@@ -86,7 +86,7 @@ module.exports.run = async (bot,message,args) => {
         }
  
         if (game.data.length === 0 && m.content.length === 3){
-            game.addId(m.content.toUpperCase(), m.author.username);
+            game.addID(m.content.toUpperCase(), m.author.username);
         }else if(m.content.length === 3){
             if (game.userPresent(m.author.username)){
                 game.deleteUserEntry(m.author.username);
@@ -121,7 +121,7 @@ module.exports.run = async (bot,message,args) => {
                 last3.addField(`${game.data[i].id.toUpperCase()} - ${game.data[i].users.length} PLAYERS`, str, true);
             }
        
-            editLast3 ({embed: last3}).catch ((err) => {
+            editLast3.edit({embed: last3}).catch ((err) => {
                 console.log ("Caught eddit error");
             });
 
@@ -147,6 +147,8 @@ module.exports.run = async (bot,message,args) => {
 module.exports.help = {
     name : "start"
 }
+
+
 
 
 
