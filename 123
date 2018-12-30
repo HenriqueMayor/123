@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const Listing = require('./../modules/Listing');
  
+const fs = require('fs');
  
 module.exports.run = async (bot,message,args) => {
     let snipeChannel = message.channel;
@@ -8,7 +9,7 @@ module.exports.run = async (bot,message,args) => {
     let game = new Listing();
     
     let raw = fs.readFileSync('./roles.json');
-    let allowedRoles = JSON.parse(raw);
+        let allowedRoles = JSON.parse(raw);
     let validation = function(serverRoles, userRoles){
         let val = false;
         serverRoles.forEach((role) => {
@@ -146,5 +147,7 @@ module.exports.run = async (bot,message,args) => {
 module.exports.help = {
     name : "start"
 }
+
+
 
 
