@@ -60,7 +60,7 @@ class Listing {
                 let tmp = this.users[i];
                 this.users[i] = this.users[0]
                 this.users[0] = tmp; 
-                this.user.shift();
+                this.users.shift();
                 return;
             }
         }
@@ -124,3 +124,4 @@ class Listing {
 }
 
 module.exports = Listing;
+
