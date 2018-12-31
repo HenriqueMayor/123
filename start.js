@@ -1,156 +1,129 @@
-const Discord = require('discord.js');
-const Listing = require('./../modules/Listing');
- 
-const fs = require('fs');
- 
-module.exports.run = async (bot,message,args) => {
-    let snipeChannel = message.channel;
-    const filter = m => !m.author.bot;
-    let game = new Listing();
-    
-    let raw = fs.readFileSync('./roles.json');
-        let allowedRoles = JSON.parse(raw);
-    let validation = function(serverRoles, userRoles){
-        let val = false;
-        serverRoles.forEach((role) => {
-            userRoles.forEach((usr) => {
-                if (role == usr){
-                    val = true;
-                }
-            });
-        });
-        return val;
+const Entry =  require('./Entry');
+
+class Listing {
+
+    constructor(){
+        
+        this.data = Array();
+        
+        this.users = Array();
     }
 
-
-
-    let editLast3 = null;
- 
-    let starMessage = new Discord.RichEmbed()
-        .setTitle("Scrim de Fortnite")
-        .setDescription("Escreva os últimos três digitos do código do seu servidor")
-        .setColor("#000099")
-        .setFooter("Péricles");
- 
-    message.channel.send({embed: starMessage});
- 
-    let time = 20;
-    let editTime = "";
- 
-    let timeEmbed = new Discord.RichEmbed()
-        .setTitle ("Próxima partida em aproximadamente...")
-        .setDescription(time + " minutos")
-        .setColor("#000099");
- 
-    setTimeout(async () => {
-        editTime = await message.channel.send({embed: timeEmbed}).catch( (err) => {
-            console.log("Não pode editar mensagem deletada");
-        });
-    }, 10)
- 
-    let timeInterval = setInterval(() => {
-        if (time === 1){
-            time -= 1;
-            timeEmbed.setDescription(time + " minutos");
-            clearInterval(timeInterval);
-        }else {
-            time -= 1;
-            timeEmbed.setDescription(time + " minutos")
+    userPresent(username){
+        console.log("userPresent called");
+            
+        if (this.users.length > 0){
+            for (var i = 0; i < this.users.length; i++){
+                if (this.users[i] === username){
+                    return true;
+                }
+            }
         }
- 
-        editTime.edit({embed: timeEmbed}).catch ( (err)  =>{
-            console.log("Não se pode editar");
-            clearInterval(timeInterval);
-        });
-    },60000);
- 
-    let last3 = new Discord.RichEmbed()
-        .setTitle ("Último 3 digitos")
-        .setColor("#000099");
- 
-    setTimeout(async () => {
-        editLast3 = await message.channel.send({embed: last3});
-    }, 10);
- 
-    const collector = snipeChannel.createMessageCollector(filter, {max: 200, maxMatches: 200, time: 180000});
- 
-    collector.on('collect', m =>{
-        console.log(`Collected $(m.content) | ${m.author.username}`);
+        return false;
+        
+        }
+    idPresent(id){
+        console.log("idPresent called")
+    
+        if (this.data.length > 0){
+            for (var i = 0; i < this.data.length; i++){
+                if (this.data[i].id === id){
+                    return true
+                }
+            }
+        }
+        return false; 
+    }
 
-        if (validation(allowedRoles.roles,m.member.roles.array())){
-            if (m.content === "!start"){
-                collector.stop();
-                console.log("Colector stopped");
+    addUser(id,username){
+        console.log("addUser called");
+
+        for (var i = 0; i < this.data.legth; i++){
+            if (this.data[i].id === id){
+                this.data[i].users.push(username);
+                this.users.push(username);
                 return;
             }
         }
- 
-        if (game.data.length === 0 && m.content.length === 3){
-            game.addID(m.content.toUpperCase(), m.author.username);
-        }else if(m.content.length === 3){
-            if (game.userPresent(m.author.username)){
-                game.deleteUserEntry(m.author.username);
-                if (game.idPresent(m.content.toUpperCase())){
-                    game.addUser(m.content.toUpperCase(), m.author.username);
-                }else {
-                    game.addID(m.content.toUpperCase(), m.author.username);
+    }
+    addID(id, username){
+        console.log("newID called")
+        this.data.push(new Entry(id,username))
+        this.users.push(username); 
+    }
+
+    deleteUser(username){
+        console.log("deleteUser called")
+
+        for (var i = 0; i < this.users.length; i++){
+            if (this.users[i] === username){
+                let tmp = this.users[i];
+                this.users[i] = this.users[0];
+                this.users[0] = tmp; 
+                this.users.shift();
+                return;
+            }
+        }
+    }
+
+
+    deleteUserEntry(username){
+        console.log("deleteUserEntry called")
+
+        if (this.data.length > 0 && this.users.length > 0){
+            if (this.data.length === 1 && this.data[0].users.legth === 1 && this.data[0].users[0] === username){
+                this.data.pop();
+                this.users.pop();
+            } else {
+                for (var i = 0; i < this.data.length; i++){
+                    if (this.data[i].users.length > 0){
+                        for (var j = 0; j < this.data[i].users.length; j++){
+                            if (this.data[i].users[j] === username && this.data[i].users.legth > 1){
+                                let tmp = this.data[i].users[j];
+                                this.data[i].users[j] = this.data[i].users[0];
+                                this.data[i].users[0] = tmp;
+
+                                let deletedUser = this.data[i].users.shift();
+                                console.log("User deleted: " + deletedUser)
+                                this.deleteUser(username);
+                                return;
+                            } else  if(this.data[i].users.length === 1 && this.data[i].users[0] === username){  
+                                let tmp2 = this.data[i];
+                                this.data[i] = this.data[0];
+                                this.data[0] = tmp2;
+
+                                let deletedID = this.data.shift();
+                                console.log (`deleted id : ${deletedID}`);
+                                this.deleteUser(username);
+                                return;
+                            }
+                        }   
+                    }
                 }
-            }  else {
-                if(game.idPresent(m.content.toUpperCase())){
-                    game.addUser(message.content.toUpperCase(), messa.author.username);
-                } else {
-                    game.addID(m.content.toUpperCase(), m.author.username);
+            }     
+        }   
+    }
+
+    sort(){
+        if (this.data.length >= 2){
+            for (var i = 0; i < this.data.length - 1; i++){
+                for (var j = i + 1; j < this.data.length; j++){
+                    if (this.data[i].users.length < this.data[j].users.length){
+                        let tmp = this.data[i];
+                        this.data[i] = this.data[j];
+                        this.data[j] = tmp;
+                           
+                    }
                 }
             }
-            }
-            
-            game.sort();
+        }
+    }
+    
 
-            let str = "";
-            last3 = new Discord.RichEmbed()
-                .setTitle("Últimos três digitos")
-                .setColor("#000099");
 
-            
-
-            for (var i = 0; i < game.data.length; i++){
-                str = "";
-                for (var j = 0; j < game.data[i].users.length; j++){
-                    str += game.data[i].users[j] + ".\n";
-                }
-                last3.addField(`${game.data[i].id.toUpperCase()} - ${game.data[i].users.length} PLAYERS`, str, true);
-            }
-       
-            editLast3.edit({embed: last3}).catch ((err) => {
-                console.log ("Caught eddit error");
-            });
-
-            if (m.deletable){
-                m.delete().catch((err) =>{
-                    console.log ("Can't delete");
-                    console.log ("err")
-                })
-            }
-
-        });
-
-        collector.on('end', collected => {
-            console.log(`Collected ${collected.size} items`);
-        });
- 
- 
- 
- 
 }
- 
- 
-module.exports.help = {
-    name : "start"
-}
 
-
-
-
+module.exports = Listing;
 
 
 
