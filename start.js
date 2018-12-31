@@ -97,7 +97,7 @@ module.exports.run = async (bot,message,args) => {
                 }
             }  else {
                 if(game.idPresent(m.content.toUpperCase())){
-                    game.addUser(message.content.toUpperCase(), message.author.username);
+                    game.addUser(m.content.toUpperCase(), m.author.username);
                 } else {
                     game.addID(m.content.toUpperCase(), m.author.username);
                 }
@@ -147,5 +147,7 @@ module.exports.run = async (bot,message,args) => {
 module.exports.help = {
     name : "start"
 }
+
+
 
 
